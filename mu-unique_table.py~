@@ -1,0 +1,12 @@
+#!/bin/usr/env python
+import sys
+
+infile = open(sys.argv[1], 'rU')
+
+dict_out = {}
+for line in infile:
+    x = line.strip().split("\t")
+    dict_out[x[0]] = x[0:len(x)]
+
+for key in dict_out.keys():
+    print key, dict_out[key]

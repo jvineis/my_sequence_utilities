@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+
+import sys
+import csv
+
+
+## Input taxonomy ID to taxonomy string - this should be a two column table with col 1 = tax id and col2 = taxonomy string
+tax_source = sys.argv[1]
+
+# output from vsearch 
+# eg "vsearch --usearch_global NODE-REPRESENTATIVES.fasta --db /groups/g454/blastdbs/gast_distributions/silva119.fa --blast6out NODE-HITS.txt --id 0.6"
+in_file = sys.argv[2]
+
+# The name of the output file where the silva ids are converted to taxonomy strings
+
+
+def open_input_to_dict(sample_name):
+    sample_dict = {}
+    with open(sample_name, 'rU') as f:
+        for line in f:
+            x = line.rstrip().split("\t")
+            newkey = x[1]
+            sample_dict[newkey] = x[0]
+    return sample_dict
+
+def open_silva_database(db_name):
+    db_name_dict = {}
+    with open(db_name, 'rU') as f:
+        for line in f:
+            x = line.rstrip().split("\t")
+            newkey = x[0]
+            db_name_dict[newkey] = x[1]
+    return db_name_dict
+
+db_lookup = open_silva_database(tax_source)
+out_silvaid_table = open_input_to_dict(in_file)
+for key in out_silvaid_table.keys():
+    print str(out_silvaid_table[key])[0:9]
+    
+
+output = open('PHYLOSEQ-TAX-OBJECT.txt', 'w')
+output.write('node'+";"+'Domain'+";"+'Phylum'+";"+'Class'+";"+'Order'+";"+'Family'+";"+'Genus'+";"+'Species'+";"+'Subsp'+"\n")
+
+for key in out_silvaid_table:
+    if key in db_lookup.keys():
+        output.write(str(out_silvaid_table[key])[0:9]+";"+db_lookup[key]+"\n")
+#    else:
+#        output.write(str(out_silvaid_table[key])[0:9]+";"+"Unknown")
